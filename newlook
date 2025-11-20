@@ -1,0 +1,519 @@
+# 🎯 PROMPT D'INGÉNIERIE DÉTAILLÉ - SmartVoice Business AI
+
+## 📋 VISION GLOBALE
+
+Créer un système intelligent de surveillance et d'alertes vocales en temps réel pour les dirigeants congolais, capable de :
+- Surveiller automatiquement toutes les opérations 24h/24
+- Détecter les anomalies, fraudes et risques en temps réel
+- Alerter vocalement les dirigeants via un casque
+- S'intégrer à n'importe quelle base de données sans modification
+- Fonctionner dans tous les domaines (santé, éducation, finance, infrastructures, etc.)
+
+---
+
+## 🏗️ ARCHITECTURE SYSTÈME
+
+### 1. COMPOSANTS PRINCIPAUX
+
+#### A. **Moteur de Surveillance Continue (Monitoring Engine)**
+- **Rôle** : Surveiller en continu toutes les données de la base
+- **Fréquence** : Vérifications toutes les 5-15 minutes (configurable)
+- **Fonctionnalités** :
+  - Surveillance des métriques clés (ventes, dépenses, projets, etc.)
+  - Détection de seuils dépassés
+  - Comparaison avec les prévisions/historiques
+  - Surveillance des délais de projets
+  - Monitoring des budgets
+
+#### B. **Moteur de Détection d'Anomalies (Anomaly Detection Engine)**
+- **Rôle** : Détecter automatiquement les comportements anormaux
+- **Techniques** :
+  - Analyse statistique (écarts-types, Z-scores)
+  - Machine Learning (isolation forest, autoencoders)
+  - Détection de patterns suspects
+  - Analyse de séries temporelles
+- **Types d'anomalies détectées** :
+  - Valeurs aberrantes (outliers)
+  - Variations soudaines
+  - Patterns inhabituels
+  - Incohérences logiques
+
+#### C. **Moteur de Détection de Fraude (Fraud Detection Engine)**
+- **Rôle** : Identifier les transactions et activités suspectes
+- **Indicateurs de fraude** :
+  - Transactions anormales (montants, fréquences)
+  - Heures inhabituelles d'activité
+  - Multiples transactions similaires
+  - Écarts entre enregistrements et réalités
+  - Doublons suspects
+- **Règles métier** :
+  - Seuils de montants suspects
+  - Patterns de fraude connus
+  - Analyse de corrélation entre événements
+
+#### D. **Système d'Alertes Vocales (Voice Alert System)**
+- **Rôle** : Générer et envoyer des alertes vocales au casque
+- **Types d'alertes** :
+  - **URGENTE** : Fraude détectée, problème critique
+  - **WARNING** : Anomalie détectée, attention requise
+  - **INFO** : Événement notable, information importante
+- **Format des alertes** :
+  - Message vocal clair et concis
+  - Priorité indiquée
+  - Contexte fourni
+  - Actions suggérées
+
+#### E. **Interface Casque (Headphone Interface)**
+- **Rôle** : Recevoir et présenter les alertes à l'utilisateur
+- **Fonctionnalités** :
+  - Connexion WebSocket pour alertes en temps réel
+  - Lecture vocale automatique des alertes
+  - Historique des alertes
+  - Paramètres de notification (priorités, heures)
+  - Mode silencieux/actif
+
+#### F. **Connecteur de Bases de Données Universel (Universal DB Connector)**
+- **Rôle** : Se connecter à n'importe quelle base de données
+- **Support** :
+  - SQL : PostgreSQL, MySQL, SQL Server, SQLite, Oracle
+  - NoSQL : MongoDB, Cassandra, Redis
+  - APIs REST : Intégration avec systèmes externes
+  - Fichiers : CSV, Excel, JSON
+- **Auto-détection** :
+  - Détection automatique du type de base
+  - Mapping automatique des schémas
+  - Adaptation aux structures existantes
+
+---
+
+## 🔄 FLUX DE FONCTIONNEMENT
+
+### FLUX 1 : Surveillance Continue
+
+```
+┌─────────────────────────────────────┐
+│  Monitoring Engine (Scheduler)      │
+│  - Exécute toutes les 5-15 min      │
+└──────────────┬──────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────┐
+│  Récupération des métriques clés    │
+│  - Ventes du jour                   │
+│  - Dépenses du mois                 │
+│  - Avancement projets               │
+│  - Budgets vs Réalisé               │
+└──────────────┬──────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────┐
+│  Analyse et Comparaison             │
+│  - Comparaison avec prévisions      │
+│  - Calcul d'écarts                  │
+│  - Détection de seuils              │
+└──────────────┬──────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────┐
+│  Détection d'Anomalies              │
+│  - Analyse statistique              │
+│  - ML Anomaly Detection             │
+└──────────────┬──────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────┐
+│  Génération d'Alertes               │
+│  - Si anomalie détectée             │
+│  - Si seuil dépassé                 │
+│  - Si fraude suspectée              │
+└──────────────┬──────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────┐
+│  Envoi Vocal au Casque              │
+│  - WebSocket                        │
+│  - TTS                              │
+│  - Notification                     │
+└─────────────────────────────────────┘
+```
+
+### FLUX 2 : Détection de Fraude en Temps Réel
+
+```
+┌─────────────────────────────────────┐
+│  Nouvelle Transaction/Événement     │
+└──────────────┬──────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────┐
+│  Fraud Detection Engine             │
+│  - Analyse de la transaction        │
+│  - Vérification des règles          │
+│  - Comparaison avec patterns        │
+└──────────────┬──────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────┐
+│  Score de Risque                    │
+│  - 0-30 : Normal                    │
+│  - 30-70 : Suspect                  │
+│  - 70-100 : Fraude probable         │
+└──────────────┬──────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────┐
+│  Si Score > 70                      │
+│  → Alerte URGENTE                   │
+│  → Notification immédiate           │
+└─────────────────────────────────────┘
+```
+
+---
+
+## 📊 RÈGLES DE DÉTECTION
+
+### 1. Détection d'Anomalies
+
+#### A. Anomalies Statistiques
+- **Écart-type** : Valeur > 3 écarts-types de la moyenne
+- **Z-score** : |Z| > 3
+- **IQR** : Valeur < Q1 - 1.5*IQR ou > Q3 + 1.5*IQR
+- **Variation soudaine** : Changement > 50% par rapport à la période précédente
+
+#### B. Anomalies Temporelles
+- **Retard projet** : Date actuelle > Date prévue + Marge
+- **Dépassement budget** : Dépenses > Budget * 1.1 (10% de marge)
+- **Performance** : Ventes < Prévisions * 0.8 (20% en dessous)
+
+#### C. Anomalies de Patterns
+- **Heures inhabituelles** : Activité en dehors des heures normales
+- **Fréquence anormale** : Nombre d'événements > 3x la moyenne
+- **Séquences suspectes** : Patterns répétitifs suspects
+
+### 2. Détection de Fraude
+
+#### A. Règles de Transaction
+- **Montant suspect** : Transaction > Seuil configuré
+- **Multiples transactions** : > 5 transactions similaires en < 1h
+- **Doublons** : Transaction identique enregistrée 2x
+- **Heure suspecte** : Transaction en dehors des heures normales
+
+#### B. Règles Métier
+- **Écart enregistrement** : Écart > 10% entre enregistré et réel
+- **Corrélation suspecte** : Plusieurs événements corrélés suspects
+- **Pattern connu** : Correspondance avec pattern de fraude connu
+
+#### C. Analyse Comportementale
+- **Changement soudain** : Comportement différent de l'historique
+- **Activité anormale** : Pic d'activité inexpliqué
+- **Géolocalisation** : Transactions depuis localisations suspectes
+
+---
+
+## 🎤 FORMAT DES ALERTES VOCALES
+
+### Structure d'une Alerte
+
+```json
+{
+  "id": "alert_123456",
+  "type": "URGENT|WARNING|INFO",
+  "category": "FRAUDE|ANOMALIE|PERFORMANCE|PROJET|BUDGET",
+  "title": "Titre court de l'alerte",
+  "message": "Message détaillé pour la voix",
+  "timestamp": "2024-01-15T08:30:00Z",
+  "priority": 1-10,
+  "context": {
+    "metric": "ventes",
+    "value": 15000,
+    "expected": 20000,
+    "deviation": -25,
+    "unit": "USD"
+  },
+  "actions": [
+    "Vérifier les transactions",
+    "Contacter le responsable"
+  ]
+}
+```
+
+### Exemples de Messages Vocaux
+
+#### Alerte Fraude
+```
+"Alerte fraude : Deux transactions anormales ont été enregistrées 
+à la régie des recettes de Kisenso. Montant total suspect : 
+150 000 francs congolais. Action recommandée : Vérification immédiate."
+```
+
+#### Alerte Performance
+```
+"Les ventes de l'agence de Lemba sont 18% plus faibles que prévu 
+pour aujourd'hui. Chiffre d'affaires actuel : 82 000 francs, 
+attendu : 100 000 francs."
+```
+
+#### Alerte Projet
+```
+"Alerte projet : Il y a un retard de 9 mois sur l'exécution du 
+projet de construction de la route Elengesa. Le rythme d'avancement 
+actuel est inférieur de 47% au planning initial."
+```
+
+---
+
+## 🔌 INTÉGRATION BASES DE DONNÉES
+
+### Configuration d'une Nouvelle Base
+
+```json
+{
+  "connection_id": "db_production",
+  "type": "postgresql|mysql|mongodb|sqlite|api",
+  "host": "localhost",
+  "port": 5432,
+  "database": "production_db",
+  "username": "user",
+  "password": "***",
+  "ssl": true,
+  "monitoring_config": {
+    "tables_to_monitor": [
+      {
+        "table": "sales",
+        "metrics": ["total_amount", "quantity"],
+        "frequency": "5min",
+        "thresholds": {
+          "min_daily": 10000,
+          "max_variation": 0.2
+        }
+      },
+      {
+        "table": "projects",
+        "metrics": ["progress", "budget_spent"],
+        "frequency": "15min",
+        "thresholds": {
+          "max_delay_days": 30,
+          "max_budget_overrun": 0.1
+        }
+      }
+    ],
+    "fraud_detection": {
+      "enabled": true,
+      "transaction_table": "transactions",
+      "rules": [
+        {
+          "name": "high_amount",
+          "threshold": 1000000,
+          "action": "alert"
+        },
+        {
+          "name": "multiple_similar",
+          "count": 5,
+          "time_window": "1h",
+          "action": "alert"
+        }
+      ]
+    }
+  }
+}
+```
+
+---
+
+## 🎧 INTERFACE CASQUE
+
+### Fonctionnalités
+
+1. **Connexion WebSocket**
+   - Connexion persistante au backend
+   - Réception d'alertes en temps réel
+   - Reconnexion automatique
+
+2. **Gestion des Alertes**
+   - File d'attente des alertes
+   - Priorisation automatique
+   - Mode silencieux/actif
+   - Filtres par type/catégorie
+
+3. **Lecture Vocale**
+   - TTS (Text-to-Speech) local ou cloud
+   - Voix française naturelle
+   - Vitesse de lecture configurable
+   - Répétition sur demande
+
+4. **Historique**
+   - Stockage local des alertes
+   - Recherche et filtrage
+   - Export des alertes
+
+5. **Paramètres**
+   - Heures de notification
+   - Types d'alertes à recevoir
+   - Volume et voix
+   - Seuils personnalisés
+
+---
+
+## 🚀 IMPLÉMENTATION TECHNIQUE
+
+### Stack Technologique
+
+#### Backend
+- **FastAPI** : API REST principale
+- **Celery** : Tâches asynchrones (monitoring)
+- **WebSocket** : Communication temps réel avec casque
+- **SQLAlchemy** : ORM pour bases SQL
+- **Pandas** : Analyse de données
+- **Scikit-learn** : ML pour détection d'anomalies
+- **Prophet** : Prédictions temporelles
+
+#### Frontend (Casque)
+- **Python/Tkinter** : Interface graphique
+- **WebSocket Client** : Réception alertes
+- **pyttsx3/gTTS** : Synthèse vocale
+- **SQLite** : Stockage local des alertes
+
+#### Infrastructure
+- **Redis** : Broker Celery + Cache
+- **PostgreSQL/SQLite** : Base de données principale
+- **Docker** (optionnel) : Containerisation
+
+### Structure des Fichiers
+
+```
+smartvoice/
+├── backend/
+│   ├── monitoring/
+│   │   ├── __init__.py
+│   │   ├── monitoring_engine.py      # Moteur de surveillance
+│   │   ├── anomaly_detector.py       # Détection d'anomalies
+│   │   ├── fraud_detector.py         # Détection de fraude
+│   │   └── alert_generator.py        # Génération d'alertes
+│   ├── alerts/
+│   │   ├── __init__.py
+│   │   ├── alert_service.py          # Service d'alertes
+│   │   ├── websocket_handler.py      # WebSocket pour alertes
+│   │   └── schemas.py                # Schémas d'alertes
+│   ├── db_connectors/
+│   │   ├── __init__.py
+│   │   ├── universal_connector.py    # Connecteur universel
+│   │   ├── sql_connector.py          # Connecteurs SQL
+│   │   ├── nosql_connector.py        # Connecteurs NoSQL
+│   │   └── api_connector.py          # Connecteur API REST
+│   └── ...
+├── device/
+│   ├── headphone_client.py           # Client casque principal
+│   ├── alert_receiver.py             # Récepteur d'alertes
+│   └── ...
+└── ...
+```
+
+---
+
+## 📝 RÈGLES DE CONFIGURATION
+
+### Configuration de Monitoring
+
+```python
+MONITORING_CONFIG = {
+    "check_interval_minutes": 5,  # Fréquence de vérification
+    "enabled_checks": [
+        "performance",      # Performance vs prévisions
+        "budget",          # Dépenses vs budget
+        "projects",        # Retards de projets
+        "anomalies",       # Détection d'anomalies
+        "fraud"            # Détection de fraude
+    ],
+    "alert_rules": {
+        "performance_threshold": 0.2,      # 20% d'écart
+        "budget_overrun_threshold": 0.1,   # 10% de dépassement
+        "project_delay_threshold_days": 30, # 30 jours de retard
+        "anomaly_confidence": 0.8,         # 80% de confiance
+        "fraud_score_threshold": 70        # Score > 70 = fraude
+    },
+    "notification_hours": {
+        "start": 6,   # 6h du matin
+        "end": 22     # 22h le soir
+    }
+}
+```
+
+---
+
+## ✅ CRITÈRES DE SUCCÈS
+
+1. **Surveillance Continue**
+   - ✅ Vérifications automatiques toutes les 5-15 minutes
+   - ✅ Détection de 95%+ des anomalies significatives
+   - ✅ Latence < 1 minute entre détection et alerte
+
+2. **Détection de Fraude**
+   - ✅ Taux de détection > 90%
+   - ✅ Taux de faux positifs < 5%
+   - ✅ Alertes en < 30 secondes après transaction suspecte
+
+3. **Alertes Vocales**
+   - ✅ Livraison < 5 secondes après génération
+   - ✅ Clarté du message vocal (compréhension > 95%)
+   - ✅ Disponibilité 24/7
+
+4. **Intégration**
+   - ✅ Support de 5+ types de bases de données
+   - ✅ Configuration en < 10 minutes
+   - ✅ Aucune modification requise sur systèmes existants
+
+---
+
+## 🎯 PHASES D'IMPLÉMENTATION
+
+### Phase 1 : Fondations (Semaine 1-2)
+- [ ] Moteur de surveillance de base
+- [ ] Détection d'anomalies statistiques simples
+- [ ] Système d'alertes basique
+- [ ] Interface casque simple
+
+### Phase 2 : Détection Avancée (Semaine 3-4)
+- [ ] Détection de fraude avec règles métier
+- [ ] ML pour détection d'anomalies
+- [ ] Alertes vocales avec TTS
+- [ ] WebSocket pour temps réel
+
+### Phase 3 : Intégration (Semaine 5-6)
+- [ ] Connecteur universel de bases de données
+- [ ] Support multi-domaines
+- [ ] Configuration avancée
+- [ ] Tests et optimisations
+
+### Phase 4 : Production (Semaine 7-8)
+- [ ] Optimisations de performance
+- [ ] Documentation complète
+- [ ] Tests d'intégration
+- [ ] Déploiement
+
+---
+
+## 📚 RESSOURCES ET RÉFÉRENCES
+
+### Algorithmes de Détection
+- Isolation Forest (scikit-learn)
+- Local Outlier Factor (LOF)
+- Autoencoders pour séries temporelles
+- Prophet pour détection d'anomalies temporelles
+
+### Standards
+- WebSocket RFC 6455
+- JSON Schema pour validation
+- REST API best practices
+
+### Sécurité
+- Chiffrement des connexions (SSL/TLS)
+- Authentification des utilisateurs
+- Audit des alertes
+- Protection contre les attaques
+
+---
+
+**Date de création** : 2024
+**Version** : 1.0
+**Auteur** : SmartVoice Team
+
