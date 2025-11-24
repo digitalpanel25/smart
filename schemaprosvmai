@@ -1,122 +1,195 @@
--------------------------------------------------------------
-|                      VOICE INTERFACE                      |
--------------------------------------------------------------
-|                                                           |
-|   [Casque ESP32]                                          |
-|     - Micro -> capture audio                              |
-|     - Chip DSP (ou firmware) -> pré-traitement audio      |
-|     - Envoi audio -> API Cloud STT (Speech-to-Text)       |
-|     - Réception voix TTS -> lecture dans les écouteurs     |
-|                                                           |
--------------------------------------------------------------
-                           |
-                           v
--------------------------------------------------------------
-|                   SPEECH-TO-TEXT (CLOUD)                  |
--------------------------------------------------------------
-|  - Transcription du message utilisateur                    |
-|  - Normalisation du texte (ponctuation, langue, contexte)  |
-|  - Passage au LLM pour routing et interprétation           |
--------------------------------------------------------------
-                           |
-                           v
--------------------------------------------------------------
-|                 LLM – ORCHESTRATION AGENT                 |
--------------------------------------------------------------
-|  Rôle :                                                   |
-|   1. Comprendre l'intention de l'utilisateur               |
-|   2. Déterminer l’action à effectuer                       |
-|   3. Choisir le bon outil (SQL, Pandas, API, RAG, etc.)    |
-|   4. Générer du code + valider + corriger                  |
-|   5. Déclencher les alertes vocales si nécessaire          |
-|                                                            |
-|  Modules :                                                 |
-|   - Prompt Routing                                         |
-|   - Agent SQL                                              |
-|   - Agent Pandas                                           |
-|   - Agent RAG                                              |
-|   - Agent Auto-Correct                                     |
-|   - Agent Sécurité (vérifie droits et limites)             |
--------------------------------------------------------------
-                           |
-                           v
--------------------------------------------------------------
-|                   KNOWLEDGE LAYER (RAG)                   |
--------------------------------------------------------------
-|   Sources :                                                |
-|     - Documentation interne                                |
-|     - Schémas SQL                                          |
-|     - Dictionnaire métier                                  |
-|     - Logs historiques et incidents                        |
-|     - Data catalog                                         |
-|                                                            |
-|   Fonctionnement :                                         |
-|     - Embeddings                                           |
-|     - Similarity search                                    |
-|     - Contexte injecté dans le prompt                     |
--------------------------------------------------------------
-                           |
-                           v
--------------------------------------------------------------
-|               SQL & PANDAS GENERATION (LLM)               |
--------------------------------------------------------------
-|                                                            |
-|   [SQL Generator]                                          |
-|     - Construit la requête SQL                             |
-|     - Vérifie la syntaxe                                   |
-|     - Compare au schéma BDD via RAG                        |
-|                                                            |
-|   [SQL Validator]                                          |
-|     - Exécute en mode "EXPLAIN"                            |
-|     - Corrige automatiquement si erreur                     |
-|                                                            |
-|   [Pandas Generator]                                       |
-|     - Génère dataframes, filtres, agrégations              |
-|     - Mutations et statistiques                             |
--------------------------------------------------------------
-                           |
-                           v
--------------------------------------------------------------
-|                 DATA ENGINE & STORAGE LAYER               |
--------------------------------------------------------------
-|  - Data Warehouse / Lake                                   |
-|  - Tables transactionnelles                                 |
-|  - Historique                                             |
-|  - Index pour requêtes rapides                             |
-|  - Cache Redis / DuckDB                                    |
--------------------------------------------------------------
-                           |
-                           v
--------------------------------------------------------------
-|               ANALYSE TEMPS RÉEL & ALERTING               |
--------------------------------------------------------------
-|  Pipeline temps réel :                                     |
-|    1. Ingestion (Kafka / MQTT / Webhooks)                  |
-|    2. Feature Engineering automatique                      |
-|    3. Détection d'anomalies (LLM + modèles Prophet)        |
-|    4. Auto-validation                                      |
-|    5. Déclenchement d’alertes                              |
-|                                                            |
-|  Types d’alertes :                                         |
-|    - Voix (TTS vers casque ESP32)                          |
-|    - SMS                                                   |
-|    - Dashboard                                             |
--------------------------------------------------------------
-                           |
-                           v
--------------------------------------------------------------
-|                      TEXT-TO-SPEECH                       |
--------------------------------------------------------------
-|  - Génération voix (neural TTS)                            |
-|  - Format audio compressé (Opus / WAV16)                   |
-|  - Envoi au casque ESP32                                   |
--------------------------------------------------------------
-                           |
-                           v
--------------------------------------------------------------
-|                     CASQUE VOCAL ESP32                    |
--------------------------------------------------------------
-|  - Reçoit la voix synthétique                              |
-|  - Lecture immédiate                                       |
-|  - Interaction en boucle avec l’utilisateur                |
--------------------------------------------------------------
+# SmartVBAI - Plateforme IA Complète : Analyse + Alertes Temps Réel + LLM
+
+## Architecture
+
+```mermaid
+graph TB
+    subgraph "Frontend/API Gateway"
+        API[API Gateway]
+    end
+    
+    subgraph "Orchestration Layer"
+        PLANNER[LLM Planner Service]
+        TEMPORAL[Temporal Workflows]
+    end
+    
+    subgraph "Intelligence Layer"
+        RAG[RAG Service]
+        GENERATOR[Code Generator]
+        VALIDATOR[Validator/Sandbox]
+        REPAIR[Auto-Correction Loop]
+    end
+    
+    subgraph "Execution Layer"
+        CLICKHOUSE[ClickHouse OLAP]
+        PANDAS[Pandas Engine]
+        WORKER[Execution Workers]
+    end
+    
+    subgraph "Analytics & Alerts"
+        ANOMALY[Anomaly Detection]
+        ALERTS[Alerts Engine]
+    end
+    
+    subgraph "Data Infrastructure"
+        KAFKA[Kafka/Redpanda]
+        DEBEZIUM[Debezium CDC]
+        S3[S3/MinIO]
+        MILVUS[Milvus Vector DB]
+    end
+    
+    subgraph "Monitoring"
+        PROM[Prometheus]
+        GRAFANA[Grafana]
+        ELK[ELK Stack]
+    end
+    
+    API --> PLANNER
+    PLANNER --> TEMPORAL
+    TEMPORAL --> RAG
+    TEMPORAL --> GENERATOR
+    GENERATOR --> VALIDATOR
+    VALIDATOR --> WORKER
+    WORKER --> CLICKHOUSE
+    WORKER --> PANDAS
+    WORKER --> ANOMALY
+    ANOMALY --> ALERTS
+    VALIDATOR --> REPAIR
+    REPAIR --> GENERATOR
+    DEBEZIUM --> KAFKA
+    KAFKA --> S3
+    RAG --> MILVUS
+    WORKER --> PROM
+    ALERTS --> PROM
+```
+
+## Structure du Projet
+
+```
+smartvbai/
+├── services/              # Microservices
+│   ├── llm-planner/      # Service de planification LLM
+│   ├── rag-service/      # Service RAG avec vector DB
+│   ├── code-generator/   # Générateur SQL/Pandas
+│   ├── validator/        # Validateur et sandbox
+│   ├── execution-engine/ # Moteur d'exécution
+│   ├── anomaly-service/  # Détection d'anomalies
+│   ├── alerts-service/   # Système d'alertes
+│   └── repair-service/   # Auto-correction
+├── workflows/            # Temporal workflows
+├── infra/                # Infrastructure as Code
+│   ├── terraform/        # Terraform modules
+│   └── helm/             # Helm charts
+├── tests/                # Tests automatisés
+│   ├── unit/
+│   ├── integration/
+│   └── e2e/
+├── docs/                 # Documentation
+│   ├── architecture.md
+│   ├── runbooks/
+│   └── api/
+└── scripts/              # Scripts utilitaires
+```
+
+## Quick Start
+
+### Prérequis
+
+- Docker & Docker Compose
+- Kubernetes (Minikube/Kind)
+- Python 3.11+
+- Terraform
+- Helm 3
+
+### Installation Locale
+
+```bash
+# 1. Cloner le repo
+git clone <repo-url>
+cd smartvbai
+
+# 2. Démarrer l'infrastructure locale
+cd infra/docker-compose
+docker-compose up -d
+
+# 3. Installer les dépendances Python
+pip install -r requirements.txt
+
+# 4. Lancer les services
+make start-services
+
+# 5. Exécuter les tests
+make test
+```
+
+## Services
+
+### LLM Planner Service
+
+Génère des plans d'exécution à partir de requêtes utilisateur.
+
+**API**: `POST /v1/plan`
+
+### RAG Service
+
+Recherche sémantique dans la documentation et schémas.
+
+**API**: `POST /v1/rag/search`
+
+### Code Generator
+
+Génère du code SQL/Pandas optimisé.
+
+**API**: `POST /v1/generate`
+
+### Validator & Sandbox
+
+Valide et exécute le code de manière sécurisée.
+
+**API**: `POST /v1/validate`, `POST /v1/execute`
+
+### Anomaly Detection
+
+Détecte les anomalies dans les KPIs.
+
+**API**: `POST /v1/anomaly/detect`
+
+### Alerts Service
+
+Gère les règles d'alerte et les dispatchers.
+
+**API**: `POST /v1/alerts/create`, `GET /v1/alerts/history`
+
+## Tests
+
+```bash
+# Tests unitaires
+pytest tests/unit/
+
+# Tests d'intégration
+pytest tests/integration/
+
+# Tests end-to-end
+pytest tests/e2e/
+```
+
+## Déploiement
+
+```bash
+# Staging
+terraform -chdir=infra/terraform apply -var=environment=staging
+
+# Production
+terraform -chdir=infra/terraform apply -var=environment=production
+```
+
+## Documentation
+
+- [Architecture détaillée](docs/architecture.md)
+- [Guide d'exploitation](docs/runbooks/operations.md)
+- [API Reference](docs/api/README.md)
+
+## License
+
+MIT
+
